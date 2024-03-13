@@ -15,7 +15,11 @@ interface Contributions {
 export function activate(context: vscode.ExtensionContext) {
   let commentParser: CommentParser;
   let bracketParser: BracketParser;
-
+  const POLcommand = 'multichar-blockscope-highlighter.PROOFOFLIFE';
+  const POLcommandHandler = () => {
+    console.log('I am alive');
+  };
+  context.subscriptions.push(vscode.commands.registerCommand(POLcommand, POLcommandHandler));
   let update = function () {
     let activeEditor = vscode.window.activeTextEditor;
     if (!activeEditor) {
@@ -23,8 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     let contributions: Contributions = vscode.workspace.getConfiguration(
-      "blockscope-highlighter"
+      "multichar-blockscope-highlighter"
     ) as any;
+    
+    // let dbchannel = vscode.window.createOutputChannel("multichar");
+    // dbchannel.appendLine("settings input reached in extension file.");
+    // dbchannel.show();
 
     let bracket: Bracket = contributions.bracket;
     let rgba: RGBA = contributions.rgba;

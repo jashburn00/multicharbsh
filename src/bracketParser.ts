@@ -40,6 +40,8 @@ export class BracketParser {
   }
 
   update(): void {
+    
+
     let pos = this.activeEditor.selection.active;
     var offsetPos = this.activeEditor.document.offsetAt(pos);
 
