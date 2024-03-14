@@ -1,3 +1,6 @@
+# add this for later
+https://code.visualstudio.com/api/get-started/your-first-extension
+
 # multichar-blockscope-highlighter README
 
 This is the README for your extension "multichar-blockscope-highlighter". After writing up a brief description, we recommend including the following sections.
