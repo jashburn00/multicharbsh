@@ -10,21 +10,27 @@ const vscode = require('vscode');
  */
 function activate(context) {
 	// proof of life command (see package.json "commands")
+	
 	let disposable = vscode.commands.registerCommand(
 		'multichar-blockscope-highlighter.proofOfLife', 
 		function () {
 			helper.logTest();
-			helper.isPositionCommented
 		}
 	);
 	context.subscriptions.push(disposable);
 }
 
 function update(){
+	/**
+	 * update is called when something changes
+	 * scan backward for first start/bracket
+	 * keep a list of the sequence of start/end delimiters encountered
+	 */
 	let editor = vscode.window.activeTextEditor;
 	if (!editor) {
 		return;
 	}
+	let delimeters = helper.loadDelimeters();
 	
 }
 
