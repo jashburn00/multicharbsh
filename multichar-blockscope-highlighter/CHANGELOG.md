@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "multicharbsh" extension will be documented in this file.
+All notable changes to the "multichar-blockscope-highlighter" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
 
-- this extension currently does not work.
+- Initial release
