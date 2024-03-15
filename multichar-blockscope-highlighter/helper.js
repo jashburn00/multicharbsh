@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const delimeters = {
-    "startDelimeter": "poop",
+    "startDelimeter": "",
     "endDelimeter": "",
     "singleLineComment": "",
     "multilineCommentStart": "",
@@ -13,7 +13,9 @@ class helper {
      * @description shows a dialog message
      */
     static logTest() {
-        vscode.window.showInformationMessage('start delimeter: '+delimeters.startDelimeter);
+        this.loadDelimeters();
+        vscode.window.showInformationMessage('start bracket: '+delimeters.startDelimeter);
+        this.checkIfBoundedByDelim('testicleft', 'testicright');
     }
 
     /**
@@ -21,69 +23,28 @@ class helper {
      * @return {vscode.Position} will return null if ur gay
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
-    static scanDocumentForScope(){
+    static checkIfBoundedByDelim(start_delim, end_delim){
+        // get active text editor and cursor position
         const editor = vscode.window.activeTextEditor;
-        const cursor_pos = editor.selection.active;
-        let scan_pos = cursor_pos;
-
-        let nesting_level = 0;
-        let scope_beginning, scope_end;
-
-        if (cursor_pos) {
-            /**
-             * If we are in a non-global scope and also in the current most narrow scope, then scanning left and incrementing/decrementing
-             * a token by the rules below will ensure that any scanning over any other scope and returning to the current scope will
-             * result in the token returning to the value it started with, in this case 0. Therefore, the first starting delimiter we hit
-             * that increments the token up to 1 must be the start of the narrowest possible scope.
-             * 
-             * // if we start at the beginning of the file then we are necessarily in the global scope (so not in any narrower scope)
-             * while scan_pos is not at the beginning of the file
-             *      
-             *      // check the left character and adjust the nesting level as required
-             *      if the character to the left is the starting delimiter
-             *          add 1 to the nesting level
-             *          if the nesting level equals 1
-             *              update the scope beginning position to the scan_pos
-             *              break out of the loop
-             *      else if the character to the left is the ending delimiter
-             *          subtract 1 from the nesting level
-             * 
-             *      scan_pos = decrementCursor(scan_pos)
-             *      
-             * 
-             * scope_beginning = scan_pos
-             * if scope_beginning points to the beginning of the file
-             *      return {"scope_start_pos": NULL, "scope_end_pos": NULL}
-             *      
-             * 
-             * // now we know we are in something's scope, so we just reverse the previous while loop to scan right and find the closing bracket
-             * 
-             * scan_pos = cursor_pos // reset the scan_pos to the cursor_pos
-             * 
-             * while scan_pos is not at the end of the file
-             * 
-             *      // check the right character and adjust the nesting level as required
-             *      if the character to the left is the starting delimiter
-             *          add 1 to the nesting level
-             *          if the nesting level equals 0
-             *              break out of the loop
-             *      else if the character to the left is the ending delimiter
-             *          subtract 1 from the nesting level
-             * 
-             *      scan_pos = decrementCursor(scan_pos)
-             * 
-             * scope_end = scan_pos
-             * // note that if the scope is closed then the loop above must necessarily break, so if this if statement fires then we should
-             * // either do nothing or throw an error
-             * if scope_end points to the end of the file
-             *      throw an error, or alternatively,
-             *      return {"scope_start_pos": NULL, "scope_end_pos": NULL}
-             * 
-             * return {"scope_start_pos": scope_beginning, "scope_end_pos": scope_end}
-             */
+        if (!editor) {
+            return;
         }
-        // while ()
+        const document = editor.document;
+        const cursor_pos = editor.selection.active;
+
+        // get all the text from the beginning of the file to the cursor position, and then
+        // get the text from the cursor position to the end of the file
+        const left_text = document.getText(new vscode.Range(new vscode.Position(0, 0), cursor_pos));
+        const right_text = document.getText(new vscode.Range(cursor_pos, document.positionAt(document.getText().length)));
         
+        const left_text_first_delim = left_text.lastIndexOf(start_delim);
+        const left_text_last_delim = left_text.IndexOf(start_delim);
+        
+        const right_text_first_delim = right_text.lastIndexOf(end_delim);
+        const right_text_last_delim = right_text.indexOf(end_delim);
+
+        
+
     }
 
     /**
@@ -122,15 +83,17 @@ class helper {
     //     return vscode.workspace.getConfiguration().get<String>('multichar-blockscope-highlighter.startDelimeter');
     // }
     static loadDelimeters() {
-        let config = vscode.workspace.getConfiguration('multicharbsh configs', vscode.workspace.workspaceFolders[0].uri);
+        // let config = vscode.workspace.getConfiguration('multicharbsh configs', vscode.workspace.workspaceFolders[0].uri);
         //oralsexdemon!
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
+        let contributions = vscode.workspace.getConfiguration('multichar-blockscope-highlighter');
+        //vscode.window.showInformationMessage('start delimeter: '+contributions.get('startDelimeter'));
         return {
-            "startDelimeter": config.get('multichar-blockscope-highlighter.startDelimeter'),
-            "endDelimeter": config.get('multichar-blockscope-highlighter.endDelimeter'),
-            "singleLineComment": config.get('multichar-blockscope-highlighter.singleLineComment'),
-            "multilineCommentStart": config.get('multichar-blockscope-highlighter.multiLineCommentStart'),
-            "multilineCommentEnd": config.get('multichar-blockscope-highlighter.multiLineCommentEnd')
+            startDelimeter: contributions.get('startDelimeter'),
+            endDelimeter: contributions.get('endDelimeter'),
+            singleLineComment: contributions.get('singleLineComment'),
+            multilineCommentStart: contributions.get('multiLineCommentStart'),
+            multilineCommentEnd: contributions.get('multiLineCommentEnd')
         };
     }
 
@@ -163,10 +126,20 @@ class helper {
 
         if (cmtStartOffset > cmtEndOffset) { // > : after
             return true;
-        }
+        } 
         
         return false;
     }
+
 }
 
 module.exports = helper, delimeters;
+
+//lksjdfksdjfsdf
+/*l
+
+
+
+I do not associate with niggers
+
+*/

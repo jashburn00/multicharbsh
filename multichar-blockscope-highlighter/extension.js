@@ -9,8 +9,7 @@ const vscode = require('vscode');
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-	// proof of life command (see package.json "commands")
-	
+	// register proof of life command (see package.json "commands")
 	let disposable = vscode.commands.registerCommand(
 		'multichar-blockscope-highlighter.proofOfLife', 
 		function () {
@@ -18,6 +17,8 @@ function activate(context) {
 		}
 	);
 	context.subscriptions.push(disposable);
+
+	helper.delimeters = helper.loadDelimeters();
 }
 
 function update(){
@@ -30,7 +31,7 @@ function update(){
 	if (!editor) {
 		return;
 	}
-	let delimeters = helper.loadDelimeters();
+	
 	
 }
 
