@@ -41,8 +41,13 @@
           "description": "the string that is used to end multiline comment blocks in your language"
         },
         "multichar-blockscope-highlighter.RGBA": {
-          "type": "array",
-          "default": [120, 120, 120, 0.1],
+          "type": "object",
+          "default": {
+            "red": 120,
+            "green": 120,
+            "blue": 120,
+            "alpha": 0.1
+          },
           "description": "array of red (0-255), green (0-255), blue (0-255), and alpha (0.0-1.0)."
         }
       }

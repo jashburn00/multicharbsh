@@ -1,26 +1,33 @@
 const vscode = require('vscode');
-const delimeters = {
-    "startDelimeter": "",
-    "endDelimeter": "",
-    "singleLineComment": "",
-    "multilineCommentStart": "",
-    "multilineCommentEnd": ""
-} //TODO: as of now, these walues ^ are what show up in the Proof of Life test command
+var delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
+    "startDelimeter": "{",
+    "endDelimeter": "}",
+    "singleLineComment": "//",
+    "multilineCommentStart": "/*",
+    "multilineCommentEnd": "*/",
+    "rgba": { //TODO: this setting does not import correctly; values are always 240, 240, 240, 0.4 (see loadDelimeters() below)
+        "red": 40,
+        "green": 60,
+        "blue": 100, 
+        "alpha": 0.5
+    }
+} 
 
-class helper {
+class functions {
 
     /**
-     * @description shows a dialog message
+     * @description used by the Proof of Life command to test shit
      */
     static logTest() {
-        this.loadDelimeters();
-        vscode.window.showInformationMessage('start bracket: '+delimeters.startDelimeter);
-        this.checkIfBoundedByDelim('testicleft', 'testicright');
+        this.loadDelimeters(); //this works 
+        vscode.window.showInformationMessage('red: '+delimeters.rgba.red); //this works
+
+        //this.checkIfBoundedByDelim('testicleft', 'testicright'); //this causes an error currently
     }
 
     /**
-     * @return {NULL, NULL} will return null if ur not gay
-     * @return {vscode.Position} will return null if ur gay
+     * @return {NULL, NULL} will return null if
+     * @return {vscode.Position} will return null if 
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
     static checkIfBoundedByDelim(start_delim, end_delim){
@@ -76,24 +83,23 @@ class helper {
     }
     
     /** 
-     * @returns {String} the start delimeter string
-     * @returns {String} the end delimeter string
+     * @description reads user settings into 'delimeters' variable
      */
-    // static loadDelimeters() {
-    //     return vscode.workspace.getConfiguration().get<String>('multichar-blockscope-highlighter.startDelimeter');
-    // }
     static loadDelimeters() {
-        // let config = vscode.workspace.getConfiguration('multicharbsh configs', vscode.workspace.workspaceFolders[0].uri);
         //oralsexdemon!
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
         let contributions = vscode.workspace.getConfiguration('multichar-blockscope-highlighter');
-        //vscode.window.showInformationMessage('start delimeter: '+contributions.get('startDelimeter'));
-        return {
+        
+        //TODO: deal with this bullshit
+        let tempRGBA = contributions.get('rgba');
+        vscode.window.showInformationMessage('red (from source): '+tempRGBA); //object loads but values in the object come out wrong
+        delimeters = {
             startDelimeter: contributions.get('startDelimeter'),
             endDelimeter: contributions.get('endDelimeter'),
             singleLineComment: contributions.get('singleLineComment'),
             multilineCommentStart: contributions.get('multiLineCommentStart'),
-            multilineCommentEnd: contributions.get('multiLineCommentEnd')
+            multilineCommentEnd: contributions.get('multiLineCommentEnd'),
+            rgba: tempRGBA //we may have to make r, g, b, and alpha individual settings despite how ugly that would be
         };
     }
 
@@ -133,13 +139,4 @@ class helper {
 
 }
 
-module.exports = helper, delimeters;
-
-//lksjdfksdjfsdf
-/*l
-
-
-
-I do not associate with niggers
-
-*/
+module.exports = { functions, delimeters};

@@ -1,5 +1,4 @@
-// import {helper} from './helper';
-const helper = require('./helper');
+var helper = require('./helper');
 const vscode = require('vscode');
 
 // This method is called when your extension is activated
@@ -13,12 +12,12 @@ function activate(context) {
 	let disposable = vscode.commands.registerCommand(
 		'multichar-blockscope-highlighter.proofOfLife', 
 		function () {
-			helper.logTest();
+			helper.functions.logTest();
 		}
 	);
 	context.subscriptions.push(disposable);
-
-	helper.delimeters = helper.loadDelimeters();
+	
+	helper.functions.loadDelimeters();
 }
 
 function update(){
