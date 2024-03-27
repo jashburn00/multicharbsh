@@ -1,4 +1,4 @@
-var helper = require('./helper');
+const {functions, delimeters} = require('./helper');
 const vscode = require('vscode');
 
 // This method is called when your extension is activated
@@ -12,26 +12,21 @@ function activate(context) {
 	let disposable = vscode.commands.registerCommand(
 		'multichar-blockscope-highlighter.proofOfLife', 
 		function () {
-			helper.functions.logTest();
+			functions.logTest();
 		}
 		);
 		context.subscriptions.push(disposable);
-		
-		helper.functions.loadDelimeters();
+		functions.loadDelimeters();
+		//functions.paintMyShit(vscode.window.activeTextEditor); //this breaks it
+
+		vscode.window.onDidChangeTextEditorSelection(update);
+		vscode.workspace.onDidChangeTextDocument(update); 
+		vscode.workspace.onDidChangeConfiguration(functions.loadDelimeters);
 }
 
 function update(){
-	/**
-	 * update is called when something changes
-	 * scan backward for first start/bracket
-	 * keep a list of the sequence of start/end delimiters encountered
-	 */
-	let editor = vscode.window.activeTextEditor;
-	if (!editor) {
-		return;
-	}
-	
-	
+	//requires that delimeters have been read
+	functions.paintMyShit(vscode.window.activeTextEditor); //this breaks it
 }
 
 function deactivate() {}

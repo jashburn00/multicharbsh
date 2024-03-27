@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-var delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
+let delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
     "startDelimeter": "{",
     "endDelimeter": "}",
     "singleLineComment": "//",
@@ -17,9 +17,29 @@ class functions {
      * @description used by the Proof of Life command to test shit
      */
     static logTest() {
-        //vscode.window.showInformationMessage('red: '+delimeters.red); //this works
-        vscode.window.showInformationMessage(this.checkIfBoundedByDelim(',', '.'));
+        vscode.window.showInformationMessage('red: '+delimeters.red); //this works
+        //vscode.window.showInformationMessage(this.checkIfBoundedByDelim(',', '.'));
         //this.checkIfBoundedByDelim('testicleft', 'testicright'); //this causes an error currently
+    }
+
+    /**
+     * //TODO: this doesn't do anything. Issue could be elsewhere
+     * @param {vscode.TextEditor} ed the active text editor
+     */
+    static paintMyShit(ed){
+        let paintRange = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter);
+        let decoration = this.getDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
+
+        ed.setDecorations(decoration, paintRange);
+    }
+
+    static getDecoration(r, g, b, a){
+        let formatString = "rgba("+r+","+g+","+b+","+a+")";
+
+        return vscode.window.createTextEditorDecorationType({
+            backgroundColor: formatString,
+            isWholeLine: true
+        });
     }
 
     /**
@@ -209,4 +229,7 @@ class functions {
 
 }
 
-module.exports = { functions, delimeters};
+module.exports = { 
+    functions: functions,
+    delimeters: delimeters
+};
