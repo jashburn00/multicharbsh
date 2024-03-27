@@ -14,10 +14,10 @@ function activate(context) {
 		function () {
 			helper.functions.logTest();
 		}
-	);
-	context.subscriptions.push(disposable);
-	
-	helper.functions.loadDelimeters();
+		);
+		context.subscriptions.push(disposable);
+		
+		helper.functions.loadDelimeters();
 }
 
 function update(){

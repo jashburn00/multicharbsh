@@ -5,12 +5,10 @@ var delimeters = { //these values get overwritten by user input; this is just in
     "singleLineComment": "//",
     "multilineCommentStart": "/*",
     "multilineCommentEnd": "*/",
-    "rgba": { //TODO: this setting does not import correctly; values are always 240, 240, 240, 0.4 (see loadDelimeters() below)
-        "red": 40,
-        "green": 60,
-        "blue": 100, 
-        "alpha": 0.5
-    }
+    "red": 100,
+    "green": 40,
+    "blue": 80,
+    "alpha": 0.4
 } 
 
 class functions {
@@ -19,67 +17,139 @@ class functions {
      * @description used by the Proof of Life command to test shit
      */
     static logTest() {
-        this.loadDelimeters(); //this works 
-        vscode.window.showInformationMessage('red: '+delimeters.rgba.red); //this works
-
+        //vscode.window.showInformationMessage('red: '+delimeters.red); //this works
+        vscode.window.showInformationMessage(this.checkIfBoundedByDelim(',', '.'));
         //this.checkIfBoundedByDelim('testicleft', 'testicright'); //this causes an error currently
     }
 
     /**
-     * @return {NULL, NULL} will return null if
-     * @return {vscode.Position} will return null if 
+     * @param {String} start delimeter
+     * @param {String} end delimeter
+     * @return {vscode.Range} returns null if no valid range was found
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
-    static checkIfBoundedByDelim(start_delim, end_delim){
+    static getRangeUsingDelimeters(start_delim, end_delim){
         // get active text editor and cursor position
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            return;
+            return null;
         }
         const document = editor.document;
         const cursor_pos = editor.selection.active;
 
-        // get all the text from the beginning of the file to the cursor position, and then
-        // get the text from the cursor position to the end of the file
-        const left_text = document.getText(new vscode.Range(new vscode.Position(0, 0), cursor_pos));
-        const right_text = document.getText(new vscode.Range(cursor_pos, document.positionAt(document.getText().length)));
+        // Loop over the left of the cursor to find where the first open start delim is
+        let scan_pos = cursor_pos;
+        let count = 0;
         
-        const left_text_first_delim = left_text.lastIndexOf(start_delim);
-        const left_text_last_delim = left_text.IndexOf(start_delim);
-        
-        const right_text_first_delim = right_text.lastIndexOf(end_delim);
-        const right_text_last_delim = right_text.indexOf(end_delim);
+        //scan backward
+        while (scan_pos){
 
-        
+            let start_delim_range = new vscode.Range(scan_pos.translate(0, -start_delim.length), scan_pos);
+            let end_delim_range = new vscode.Range(scan_pos.translate(0, -end_delim.length), scan_pos);
 
+            // Check the character at the current position, increment the count if it's the start delim, decrement if it's the end delim
+            // startDelim -> +1  endDelim -> -1  count = 1 -> found it
+            if (document.getText(start_delim_range) == start_delim){
+                if(!this.isPositionCommented(document, scan_pos)){
+                    count++;
+                }
+                if (count == 1){
+                    break;
+                }
+            }
+            else if (document.getText(end_delim_range) == end_delim){
+                if(!this.isPositionCommented(document, scan_pos)){
+                    count--;
+                }
+            }
+            // decrement the scan position
+            scan_pos = this.decrementCursor(scan_pos, document);
+        }
+
+        if (!scan_pos){
+            return null;
+        }
+
+        const left_delim_pos = scan_pos;
+        
+        scan_pos = cursor_pos;
+        count = 0;
+
+        //scan forward
+        while(scan_pos){
+            //create range using current position
+            let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, start_delim.length));
+            let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, end_delim.length));
+            
+            //check if we found the delimeter
+            if(document.getText(start_delim_range) == start_delim){
+                if(!this.isPositionCommented(document, scan_pos)){
+                    count++;
+                }
+            }
+            if(document.getText(end_delim_range) == end_delim){
+                if(!this.isPositionCommented(document, scan_pos)){
+                    count--;
+                }
+                if(count == -1){
+                    break; 
+                }
+            }
+
+            scan_pos = this.incrementCursor(scan_pos, document);
+        }
+
+        if (!scan_pos){
+            return null;
+        }
+
+        const right_delim_pos = scan_pos;
+
+        return new vscode.Range(left_delim_pos, right_delim_pos); //this is the region that must get painted
     }
 
     /**
-     * Given a cursor position, returns a cursor set to the end of that line
-     * @param {vscode.Position}
-     * @returns {vscode.Position}
+     * @param {vscode.Position} pos: the position to decrement
+     * @returns {vscode.Position} the decremented position, or null if the cursor is at the beginning of the file
      */
-    static setCursorToEndOfLine(pos){
+    static decrementCursor(pos, doc){
         
+        let new_pos;
+        if (pos.character > 0){
+            new_pos = vscode.Position(pos.line, pos.character - 1);
+            return new_pos
+        }
+        else if (pos.line > 0){
+            let new_line = doc.lineAt(pos.line - 1);
+            new_pos = vscode.Position(pos.line - 1, new_line.text.length);
+            return new_pos;
+        }
+        else {
+            // character and line are always nonnegative, so this branch means pos.character == 0 and pos.line == 0
+            // so we are at the beginning of the file
+            return new_pos;
+        }
     }
 
     /**
-     * Given a cursor position, returns a cursor set to the start of that line
-     * @param {vscode.Position}
-     * @returns {vscode.Position}
+     * @param {vscode.Position} pos: the position to increment
+     * @returns {vscode.Position} the incremented position, or null if increment not possible
      */
-    static setCursorToStartOfLine(pos){
-
-    }
-
-    /**
-     * Given a cursor position, decrements the character position by one or, if at the start of the line, move the cursor
-     * to the end of the next line. If at the beginning of the file, does nothing.
-     * @param {vscode.Position}
-     * @returns {vscode.Position}
-     */
-    static decrementCursor(pos){
-        
+    static incrementCursor(pos, doc){
+        let lastPosition = doc.lineAt(doc.lineCount - 1).range.end;
+        if (pos.isEqual(lastPosition)){
+            //if last position already
+            return; 
+        }
+        else {
+            if(pos.character == doc.lineAt(pos.line).text.length){
+                //if last character in a line
+                return new vscode.Position(pos.line+1, 0);
+            } else{
+                // otherwise it can increment normally
+                return new vscode.Position(pos.line, pos.character+1);
+            }
+        }
     }
     
     /** 
@@ -90,28 +160,28 @@ class functions {
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
         let contributions = vscode.workspace.getConfiguration('multichar-blockscope-highlighter');
         
-        //TODO: deal with this bullshit
-        let tempRGBA = contributions.get('rgba');
-        vscode.window.showInformationMessage('red (from source): '+tempRGBA); //object loads but values in the object come out wrong
         delimeters = {
             startDelimeter: contributions.get('startDelimeter'),
             endDelimeter: contributions.get('endDelimeter'),
             singleLineComment: contributions.get('singleLineComment'),
             multilineCommentStart: contributions.get('multiLineCommentStart'),
             multilineCommentEnd: contributions.get('multiLineCommentEnd'),
-            rgba: tempRGBA //we may have to make r, g, b, and alpha individual settings despite how ugly that would be
+            red: contributions.get('red'),
+            green: contributions.get('green'),
+            blue: contributions.get('blue'),
+            alpha: contributions.get('alpha')
         };
     }
 
-    /**
-     * @param {vscode.Position} "p" the position in question
-     * @param {String} "start" the chosen start string/bracket
-     * @param {String} "end" the chosen end string/bracket 
-     * @returns {vscode.Range} range between start/end brackets
-     */
-    static getScope(p, start, end){
-        var num = 5;
-    }
+    // /**
+    //  * @param {vscode.Position} "p" the position in question
+    //  * @param {String} "start" the chosen start string/bracket
+    //  * @param {String} "end" the chosen end string/bracket 
+    //  * @returns {vscode.Range} range between start/end brackets
+    //  */
+    // static getScope(p, start, end){
+    //     var num = 5;
+    // }
 
     /**
      * @param {vscode.TextDocument} "d" the active document
@@ -120,15 +190,15 @@ class functions {
      */
     static isPositionCommented(d, p) {
         let line = d.lineAt(p.line);
-        if (line.text.trim().startsWith('//')){
+        if (line.text.trim().startsWith(delimeters.singleLineComment)){
             return true;
         } 
 
         let offset = d.offsetAt(p);
         let text = d.getText();
 
-        let cmtStartOffset = text.lastIndexOf('/*', offset - 1); 
-        let cmtEndOffset = text.lastIndexOf('*/', offset - 1);
+        let cmtStartOffset = text.lastIndexOf(delimeters.multilineCommentStart, offset - 1); 
+        let cmtEndOffset = text.lastIndexOf(delimeters.multilineCommentEnd, offset - 1);
 
         if (cmtStartOffset > cmtEndOffset) { // > : after
             return true;
