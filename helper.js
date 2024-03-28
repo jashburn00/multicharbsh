@@ -9,15 +9,24 @@ let delimeters = { //these values get overwritten by user input; this is just in
     "green": 40,
     "blue": 80,
     "alpha": 0.4
-} 
+} // [error] TypeError: Class constructor w cannot be invoked without 'new'
+const orange = vscode.window.createOutputChannel('Orange'); //because debugging is too much to ask
 
 class functions {
 
     /**
      * @description used by the Proof of Life command to test shit
      */
-    static logTest() {
-        vscode.window.showInformationMessage('red: '+delimeters.red); //this works
+    static logTest(ed) {
+        const editor = ed;
+        let delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
+        if (delim_range == null){
+            vscode.window.showInformationMessage("8===>~~");
+        }
+        else {
+            let text = vscode.window.activeTextEditor.document.getText(delim_range);
+            vscode.window.showInformationMessage(text); //this works
+        }
         //vscode.window.showInformationMessage(this.checkIfBoundedByDelim(',', '.'));
         //this.checkIfBoundedByDelim('testicleft', 'testicright'); //this causes an error currently
     }
@@ -26,21 +35,21 @@ class functions {
      * //TODO: this doesn't do anything. Issue could be elsewhere
      * @param {vscode.TextEditor} ed the active text editor
      */
-    static paintMyShit(ed){
-        let paintRange = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter);
-        let decoration = this.getDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
+    // static paintMyShit(ed){
+    //     let paintRange = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter);
+    //     let decoration = this.getDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
 
-        ed.setDecorations(decoration, paintRange);
-    }
+    //     ed.setDecorations(decoration, paintRange);
+    // }
 
-    static getDecoration(r, g, b, a){
-        let formatString = "rgba("+r+","+g+","+b+","+a+")";
+    // static getDecoration(r, g, b, a){
+    //     let formatString = "rgba("+r+","+g+","+b+","+a+")";
 
-        return vscode.window.createTextEditorDecorationType({
-            backgroundColor: formatString,
-            isWholeLine: true
-        });
-    }
+    //     return vscode.window.createTextEditorDecorationType({
+    //         backgroundColor: formatString,
+    //         isWholeLine: true
+    //     });
+    // }
 
     /**
      * @param {String} start delimeter
@@ -48,9 +57,11 @@ class functions {
      * @return {vscode.Range} returns null if no valid range was found
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
-    static getRangeUsingDelimeters(start_delim, end_delim){
+    static getRangeUsingDelimeters(start_delim, end_delim, ed){
         // get active text editor and cursor position
-        const editor = vscode.window.activeTextEditor;
+
+        // const editor = vscode.window.activeTextEditor;
+        const editor = ed;
         if (!editor) {
             return null;
         }
@@ -61,71 +72,85 @@ class functions {
         let scan_pos = cursor_pos;
         let count = 0;
         
+        orange.appendLine('~~~~~~~~~~about to try sjum~~~~~~~~~~~~~~');
+
+        let token = 0;
         //scan backward
         while (scan_pos){
+            token++;
+            // let start_delim_range = new vscode.Range(scan_pos.translate(0, -1*start_delim.length), scan_pos);
+            // let end_delim_range = new vscode.Range(scan_pos.translate(0, -1*end_delim.length), scan_pos);
 
-            let start_delim_range = new vscode.Range(scan_pos.translate(0, -start_delim.length), scan_pos);
-            let end_delim_range = new vscode.Range(scan_pos.translate(0, -end_delim.length), scan_pos);
 
             // Check the character at the current position, increment the count if it's the start delim, decrement if it's the end delim
             // startDelim -> +1  endDelim -> -1  count = 1 -> found it
-            if (document.getText(start_delim_range) == start_delim){
-                if(!this.isPositionCommented(document, scan_pos)){
-                    count++;
-                }
-                if (count == 1){
-                    break;
-                }
-            }
-            else if (document.getText(end_delim_range) == end_delim){
-                if(!this.isPositionCommented(document, scan_pos)){
-                    count--;
-                }
-            }
+            // if (document.getText(start_delim_range) == start_delim){
+            //     if(!functions.isPositionCommented(document, scan_pos)){
+            //         count++;
+            //     }
+            //     if (count == 1){
+            //         break;
+            //     }
+            // }
+            // else if (document.getText(end_delim_range) == end_delim){
+            //     if(!functions.isPositionCommented(document, scan_pos)){
+            //         count--;
+            //     }
+            // }
             // decrement the scan position
+            orange.appendLine('token: '+token.toString());
+            // vscode.window.showInformationMessage("token: "+token.toString());
             scan_pos = this.decrementCursor(scan_pos, document);
+            if (token > 10){
+                break;
+            }
         }
+        // vscode.window.showInformationMessage("token: "+token.toString());
 
-        if (!scan_pos){
-            return null;
-        }
+        orange.appendLine('~~~~~~~~~~done with sjum~~~~~~~~~~~~~~');
 
-        const left_delim_pos = scan_pos;
+        // if (!scan_pos){
+        //     vscode.window.showInformationMessage('RETURNING NULL start bracket');
+        //     return null;
+        // }
+
+        // const left_delim_pos = scan_pos;
         
-        scan_pos = cursor_pos;
-        count = 0;
+        // scan_pos = cursor_pos;
+        // count = 0;
 
-        //scan forward
-        while(scan_pos){
-            //create range using current position
-            let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, start_delim.length));
-            let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, end_delim.length));
+        // //scan forward
+        // while(scan_pos){
+        //     //create range using current position
+        //     let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, start_delim.length));
+        //     let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, end_delim.length));
             
-            //check if we found the delimeter
-            if(document.getText(start_delim_range) == start_delim){
-                if(!this.isPositionCommented(document, scan_pos)){
-                    count++;
-                }
-            }
-            if(document.getText(end_delim_range) == end_delim){
-                if(!this.isPositionCommented(document, scan_pos)){
-                    count--;
-                }
-                if(count == -1){
-                    break; 
-                }
-            }
+        //     //check if we found the delimeter
+        //     if(document.getText(start_delim_range) == start_delim){
+        //         if(!this.isPositionCommented(document, scan_pos)){
+        //             count++;
+        //         }
+        //     }
+        //     if(document.getText(end_delim_range) == end_delim){
+        //         if(!this.isPositionCommented(document, scan_pos)){
+        //             count--;
+        //         }
+        //         if(count == -1){
+        //             break; 
+        //         }
+        //     }
 
-            scan_pos = this.incrementCursor(scan_pos, document);
-        }
+        //     scan_pos = this.incrementCursor(scan_pos, document);
+        // }
 
-        if (!scan_pos){
-            return null;
-        }
+        // if (!scan_pos){
+        //     vscode.window.showInformationMessage('RETURNING NULL end bracket');
+        //     return null;
+        // }
 
-        const right_delim_pos = scan_pos;
-
-        return new vscode.Range(left_delim_pos, right_delim_pos); //this is the region that must get painted
+        // const right_delim_pos = scan_pos;
+        // vscode.window.showInformationMessage('RETURNING RANGE: '+left_delim_pos+", "+right_delim_pos);
+        // return new vscode.Range(left_delim_pos, right_delim_pos); //this is the region that must get painted
     }
 
     /**
@@ -134,20 +159,32 @@ class functions {
      */
     static decrementCursor(pos, doc){
         
-        let new_pos;
+        // vscode.window.showInformationMessage('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
+        // vscode.window.showInformationMessage('decrementCursor() has begun');
+        orange.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
+        
         if (pos.character > 0){
-            new_pos = vscode.Position(pos.line, pos.character - 1);
-            return new_pos
+            orange.appendLine('Epstein');
+            // let new_pos = vscode.Position(pos.line, pos.character - 1);
+            let new_pos = pos.translate(0, -1);
+            return new_pos;
         }
         else if (pos.line > 0){
-            let new_line = doc.lineAt(pos.line - 1);
-            new_pos = vscode.Position(pos.line - 1, new_line.text.length);
+            orange.appendLine('didnt'); 
+            // vscode.window.showInformationMessage("didn't");
+            // let new_line = doc.lineAt(pos.line - 1);
+            // let new_pos = vscode.Position(pos.line - 1, new_line.text.length);
+            let new_pos = pos.translate(-1, doc.lineAt(pos.line - 1).text.length);
             return new_pos;
+            // return null;
         }
         else {
+            orange.appendLine('kill himself');
+            // vscode.window.showInformationMessage("kill himself");
             // character and line are always nonnegative, so this branch means pos.character == 0 and pos.line == 0
             // so we are at the beginning of the file
-            return new_pos;
+            // return new_pos;
+            return null;
         }
     }
 
