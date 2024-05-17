@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const MBSHlog = vscode.window.createOutputChannel('MBSH Log'); //this replaces the need for running POL command
 let delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
     "startDelimeter": "{",
     "endDelimeter": "}",
@@ -9,8 +10,7 @@ let delimeters = { //these values get overwritten by user input; this is just in
     "green": 40,
     "blue": 80,
     "alpha": 0.4
-} // [error] TypeError: Class constructor w cannot be invoked without 'new'
-const orange = vscode.window.createOutputChannel('Orange'); //because debugging is too much to ask
+} 
 
 class functions {
 
@@ -72,7 +72,7 @@ class functions {
         let scan_pos = cursor_pos;
         let count = 0;
         
-        orange.appendLine('~~~~~~~~~~about to try sjum~~~~~~~~~~~~~~');
+        MBSHlog.appendLine('~~~~~~~~~~about to try sjum~~~~~~~~~~~~~~');
 
         let token = 0;
         //scan backward
@@ -98,7 +98,7 @@ class functions {
             //     }
             // }
             // decrement the scan position
-            orange.appendLine('token: '+token.toString());
+            MBSHlog.appendLine('token: '+token.toString());
             // vscode.window.showInformationMessage("token: "+token.toString());
             scan_pos = this.decrementCursor(scan_pos, document);
             if (token > 10){
@@ -107,7 +107,7 @@ class functions {
         }
         // vscode.window.showInformationMessage("token: "+token.toString());
 
-        orange.appendLine('~~~~~~~~~~done with sjum~~~~~~~~~~~~~~');
+        MBSHlog.appendLine('~~~~~~~~~~done with sjum~~~~~~~~~~~~~~');
 
         // if (!scan_pos){
         //     vscode.window.showInformationMessage('RETURNING NULL start bracket');
@@ -161,16 +161,16 @@ class functions {
         
         // vscode.window.showInformationMessage('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
         // vscode.window.showInformationMessage('decrementCursor() has begun');
-        orange.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
+        MBSHlog.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
         
         if (pos.character > 0){
-            orange.appendLine('Epstein');
+            MBSHlog.appendLine('Epstein');
             // let new_pos = vscode.Position(pos.line, pos.character - 1);
             let new_pos = pos.translate(0, -1);
             return new_pos;
         }
         else if (pos.line > 0){
-            orange.appendLine('didnt'); 
+            MBSHlog.appendLine('didnt'); 
             // vscode.window.showInformationMessage("didn't");
             // let new_line = doc.lineAt(pos.line - 1);
             // let new_pos = vscode.Position(pos.line - 1, new_line.text.length);
@@ -179,7 +179,7 @@ class functions {
             // return null;
         }
         else {
-            orange.appendLine('kill himself');
+            MBSHlog.appendLine('kill himself');
             // vscode.window.showInformationMessage("kill himself");
             // character and line are always nonnegative, so this branch means pos.character == 0 and pos.line == 0
             // so we are at the beginning of the file
