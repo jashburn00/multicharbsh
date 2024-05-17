@@ -15,20 +15,21 @@ let delimeters = { //these values get overwritten by user input; this is just in
 class functions {
 
     /**
-     * @description used by the Proof of Life command to test shit
+     * @description called by the Proof of Life command
      */
     static logTest(ed) {
         const editor = ed;
+        MBSHlog.appendLine("Attempting to get current range...");
         let delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
         if (delim_range == null){
-            vscode.window.showInformationMessage("8===>~~");
+            vscode.window.showInformationMessage("the range returned from our method was NULL.");
         }
         else {
+            MBSHlog.appendLine("The returned range was: ");
             let text = vscode.window.activeTextEditor.document.getText(delim_range);
-            vscode.window.showInformationMessage(text); //this works
+            vscode.window.showInformationMessage(text);
+            MBSHlog.append(text); 
         }
-        //vscode.window.showInformationMessage(this.checkIfBoundedByDelim(',', '.'));
-        //this.checkIfBoundedByDelim('testicleft', 'testicright'); //this causes an error currently
     }
 
     /**
@@ -54,29 +55,29 @@ class functions {
     /**
      * @param {String} start delimeter
      * @param {String} end delimeter
+     * @param {vscode.editor} ed the editor
      * @return {vscode.Range} returns null if no valid range was found
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
     static getRangeUsingDelimeters(start_delim, end_delim, ed){
-        // get active text editor and cursor position
-
-        // const editor = vscode.window.activeTextEditor;
         const editor = ed;
+        const doc = editor.document;
         if (!editor) {
+            MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingDelimeters method.");
             return null;
         }
         const document = editor.document;
         const cursor_pos = editor.selection.active;
 
-        // Loop over the left of the cursor to find where the first open start delim is
+        //scan backward until we have found more start delimeters than end delimeters
         let scan_pos = cursor_pos;
-        let count = 0;
-        
-        MBSHlog.appendLine('~~~~~~~~~~about to try sjum~~~~~~~~~~~~~~');
-
         let token = 0;
-        //scan backward
         while (scan_pos){
+            //returning character left of cursor for dummy test run
+            MBSHlog.appendLine("using first index behind cursor as left delimeter (test run)");
+            scan_pos = this.decrementCursor(scan_pos, doc);
+            break;
+            
             token++;
             // let start_delim_range = new vscode.Range(scan_pos.translate(0, -1*start_delim.length), scan_pos);
             // let end_delim_range = new vscode.Range(scan_pos.translate(0, -1*end_delim.length), scan_pos);
@@ -105,14 +106,24 @@ class functions {
                 break;
             }
         }
-        // vscode.window.showInformationMessage("token: "+token.toString());
+        const left_delim_pos = scan_pos;
 
-        MBSHlog.appendLine('~~~~~~~~~~done with sjum~~~~~~~~~~~~~~');
+        MBSHlog.appendLine("moving on to find end delimeter position...");
+        //scan forward until we have found more end delimeters than start delimeters
+        scan_pos = cursor_pos;
+        while(scan_pos){
+            //returning character right of cursor for dummy test run
+            MBSHlog.appendLine("using first index after cursor as right delimeter (test run)");
+            scan_pos = this.incrementCursor(scan_pos, doc);
+            break;
+        }
+        const right_delim_pos = scan_pos;
+        let generatedRange = new vscode.Range(left_delim_pos, right_delim_pos);
 
-        // if (!scan_pos){
-        //     vscode.window.showInformationMessage('RETURNING NULL start bracket');
-        //     return null;
-        // }
+        MBSHlog.appendLine("returning from getRangeUsingDelimeters method with range:");
+        let msg = doc.getText(generatedRange, doc);
+        MBSHlog.append(msg);
+        return generatedRange;
 
         // const left_delim_pos = scan_pos;
         
@@ -164,14 +175,12 @@ class functions {
         MBSHlog.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
         
         if (pos.character > 0){
-            MBSHlog.appendLine('Epstein');
-            // let new_pos = vscode.Position(pos.line, pos.character - 1);
+            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to the left');
             let new_pos = pos.translate(0, -1);
             return new_pos;
         }
         else if (pos.line > 0){
-            MBSHlog.appendLine('didnt'); 
-            // vscode.window.showInformationMessage("didn't");
+            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to end of previous line'); 
             // let new_line = doc.lineAt(pos.line - 1);
             // let new_pos = vscode.Position(pos.line - 1, new_line.text.length);
             let new_pos = pos.translate(-1, doc.lineAt(pos.line - 1).text.length);
@@ -179,7 +188,7 @@ class functions {
             // return null;
         }
         else {
-            MBSHlog.appendLine('kill himself');
+            MBSHlog.appendLine('IN DECREMENTCURSOR: at beginning of range, so returning null.');
             // vscode.window.showInformationMessage("kill himself");
             // character and line are always nonnegative, so this branch means pos.character == 0 and pos.line == 0
             // so we are at the beginning of the file
@@ -268,5 +277,6 @@ class functions {
 
 module.exports = { 
     functions: functions,
-    delimeters: delimeters
+    delimeters: delimeters,
+    log: MBSHlog
 };
