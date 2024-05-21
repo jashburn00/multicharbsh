@@ -19,38 +19,52 @@ class functions {
      */
     static logTest(ed) {
         const editor = ed;
+        MBSHlog.appendLine("\nExecuting logtest()...");
+        MBSHlog.appendLine("Attempting to check if current position is a comment...");
+        MBSHlog.appendLine(this.isPositionCommented(ed.document, ed.selection.active).toString());
+        MBSHlog.appendLine("");
+
         MBSHlog.appendLine("Attempting to get current range...");
         let delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
         if (delim_range == null){
-            vscode.window.showInformationMessage("the range returned from our method was NULL.");
+            vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
         }
         else {
             MBSHlog.appendLine("The returned range was: ");
             let text = vscode.window.activeTextEditor.document.getText(delim_range);
             vscode.window.showInformationMessage(text);
-            MBSHlog.append(text); 
+            MBSHlog.append(text+"\n"); 
         }
+        
+        MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
+        this.paintRange(ed, delim_range);
     }
 
     /**
-     * //TODO: this doesn't do anything. Issue could be elsewhere
+     * //TODO: this needs to clear previous decoration before decorating
      * @param {vscode.TextEditor} ed the active text editor
      */
-    // static paintMyShit(ed){
-    //     let paintRange = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter);
-    //     let decoration = this.getDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
+    static paintRange(ed, range){
+        const decoration = this.createDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
+        const decorationOptions = this.createDecorationOptions(range);
+        ed.setDecorations(decoration, decorationOptions);
+    }
 
-    //     ed.setDecorations(decoration, paintRange);
-    // }
+    static createDecoration(r, g, b, a){
+        let formatString = "rgba("+r+","+g+","+b+","+a+")";
+        return vscode.window.createTextEditorDecorationType({
+            backgroundColor: ''+formatString,
+            isWholeLine: false
+        });
+    }
 
-    // static getDecoration(r, g, b, a){
-    //     let formatString = "rgba("+r+","+g+","+b+","+a+")";
-
-    //     return vscode.window.createTextEditorDecorationType({
-    //         backgroundColor: formatString,
-    //         isWholeLine: true
-    //     });
-    // }
+    static createDecorationOptions(r){
+        const retval = [];
+        retval.push({
+            range: r
+        });
+        return retval;
+    }
 
     /**
      * @param {String} start delimeter
@@ -120,9 +134,9 @@ class functions {
         const right_delim_pos = scan_pos;
         let generatedRange = new vscode.Range(left_delim_pos, right_delim_pos);
 
-        MBSHlog.appendLine("returning from getRangeUsingDelimeters method with range:");
+        MBSHlog.append("returning from getRangeUsingDelimeters method with range:  ");
         let msg = doc.getText(generatedRange, doc);
-        MBSHlog.append(msg);
+        MBSHlog.append(msg+"\n");
         return generatedRange;
 
         // const left_delim_pos = scan_pos;
@@ -172,7 +186,7 @@ class functions {
         
         // vscode.window.showInformationMessage('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
         // vscode.window.showInformationMessage('decrementCursor() has begun');
-        MBSHlog.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
+        //MBSHlog.appendLine('decrementCursor() '+pos.character.toString()+' '+pos.line.toString());
         
         if (pos.character > 0){
             MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to the left');
@@ -204,19 +218,17 @@ class functions {
     static incrementCursor(pos, doc){
         let lastPosition = doc.lineAt(doc.lineCount - 1).range.end;
         if (pos.isEqual(lastPosition)){
-            //if last position already
-            return; 
-        }
-        else {
-            if(pos.character == doc.lineAt(pos.line).text.length){
-                //if last character in a line
-                return new vscode.Position(pos.line+1, 0);
-            } else{
-                // otherwise it can increment normally
-                return new vscode.Position(pos.line, pos.character+1);
-            }
+            MBSHlog.appendLine("IN INCREMENTCURSOR: returning null because we are at the last position");
+            return null; 
+        } else if (pos.character == doc.lineAt(pos.line).text.length){
+            MBSHlog.appendLine("IN INCREMENTCURSOR: returning first character at next line");
+            return new vscode.Position(pos.line+1, 0);
+        } else {
+            MBSHlog.appendLine("IN INCREMENTCURSOR: incrementing normally (horizontally)");
+            return new vscode.Position(pos.line, pos.character+1);
         }
     }
+    
     
     /** 
      * @description reads user settings into 'delimeters' variable
@@ -238,16 +250,6 @@ class functions {
             alpha: contributions.get('alpha')
         };
     }
-
-    // /**
-    //  * @param {vscode.Position} "p" the position in question
-    //  * @param {String} "start" the chosen start string/bracket
-    //  * @param {String} "end" the chosen end string/bracket 
-    //  * @returns {vscode.Range} range between start/end brackets
-    //  */
-    // static getScope(p, start, end){
-    //     var num = 5;
-    // }
 
     /**
      * @param {vscode.TextDocument} "d" the active document
@@ -271,6 +273,10 @@ class functions {
         } 
         
         return false;
+    }
+
+    static printFormatRange(range){
+        return "["+range.start.line+", "+range.start.character+"] ["+range.end.line+", "+range.end.character+"]";
     }
 
 }
