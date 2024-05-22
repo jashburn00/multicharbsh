@@ -11,6 +11,7 @@ let delimeters = { //these values get overwritten by user input; this is just in
     "blue": 80,
     "alpha": 0.4
 } 
+let decorations = [];
 
 class functions {
 
@@ -45,9 +46,16 @@ class functions {
      * @param {vscode.TextEditor} ed the active text editor
      */
     static paintRange(ed, range){
-        const decoration = this.createDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha);
+        //create the necessary decorationType and decorationOption
+        decorations.push( this.createDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha));
         const decorationOptions = this.createDecorationOptions(range);
-        ed.setDecorations(decoration, decorationOptions);
+        //clear any existing decoration (must reference original decoration to remove it properly, so we use a list)
+        if (decorations.length > 1){
+            ed.setDecorations(decorations[0], []);
+            decorations = [decorations[1]];
+        }
+        //apply our new decoration 
+        ed.setDecorations(decorations[0], decorationOptions);
     }
 
     static createDecoration(r, g, b, a){
