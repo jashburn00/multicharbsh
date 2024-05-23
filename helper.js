@@ -20,30 +20,39 @@ class functions {
      */
     static logTest(ed) {
         const editor = ed;
+        let delim_range;
         MBSHlog.appendLine("\nExecuting logtest()...");
-        MBSHlog.appendLine("Attempting to check if current position is a comment...");
-        MBSHlog.appendLine(this.isPositionCommented(ed.document, ed.selection.active).toString());
-        MBSHlog.appendLine("");
 
-        MBSHlog.appendLine("Attempting to get current range...");
-        let delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
-        if (delim_range == null){
-            vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
+        /* check if cursor position is commented */{
+            // MBSHlog.appendLine("Attempting to check if current position is a comment...");
+            // MBSHlog.appendLine(this.isPositionCommented(ed.document, ed.selection.active).toString());
+            // MBSHlog.appendLine("");
         }
-        else {
-            MBSHlog.appendLine("The returned range was: ");
-            let text = vscode.window.activeTextEditor.document.getText(delim_range);
-            vscode.window.showInformationMessage(text);
-            MBSHlog.append(text+"\n"); 
+
+        /* get current range from cursor position (delim_range is populated) */{
+            MBSHlog.appendLine("Attempting to get current range...");
+            delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
+            if (delim_range == null){
+                vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
+            }
+            else {
+                MBSHlog.appendLine("The returned range was: ");
+                let text = vscode.window.activeTextEditor.document.getText(delim_range);
+                vscode.window.showInformationMessage(text);
+                MBSHlog.append(text+"\n"); 
+            }
         }
         
-        MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
-        this.paintRange(ed, delim_range);
+        /* apply decoration to delim_range */{
+            MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
+            this.paintRange(ed, delim_range);
+        }
     }
 
     /**
-     * //TODO: this needs to clear previous decoration before decorating
      * @param {vscode.TextEditor} ed the active text editor
+     * @param {vscode.Range} range the range to decorate
+     * @description clears previous decoration and applies new one
      */
     static paintRange(ed, range){
         //create the necessary decorationType and decorationOption
@@ -275,6 +284,7 @@ class functions {
 
         let cmtStartOffset = text.lastIndexOf(delimeters.multilineCommentStart, offset - 1); 
         let cmtEndOffset = text.lastIndexOf(delimeters.multilineCommentEnd, offset - 1);
+        
 
         if (cmtStartOffset > cmtEndOffset) { // > : after
             return true;

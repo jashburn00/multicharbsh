@@ -1,5 +1,11 @@
 # add this for later
 https://code.visualstudio.com/api/get-started/your-first-extension
+# TODO 
+- return [cursor, cursor+3] to determine syntax/functionality
+- correct range collection methods
+- testing
+  - different delimeters 
+- deployment
 
 # README - multicharbsh
 
