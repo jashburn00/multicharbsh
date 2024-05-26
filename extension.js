@@ -1,5 +1,6 @@
 const {functions, delimeters, log} = require('./helper');
 const vscode = require('vscode');
+var selection = new vscode.Position(0,0);
 
 function activate(context) {
 
@@ -10,6 +11,10 @@ function activate(context) {
 			functions.logTest(vscode.window.activeTextEditor);
 		}
 	);
+
+	let disposableUpdate = vscode.window.onDidChangeTextEditorSelection(update);
+	
+	context.subscriptions.push(disposableUpdate);
 	context.subscriptions.push(POLcommand);
 	functions.loadDelimeters();
 	log.appendLine("Extension has been activated.");
@@ -20,8 +25,10 @@ function activate(context) {
 }
 
 function update(){
-	//requires that delimeters have been read
-	//functions.paintMyShit(vscode.window.activeTextEditor); //this breaks it
+	if(vscode.window.activeTextEditor.selection != selection){
+		selection = vscode.window.activeTextEditor.selection;
+		functions.logTest(vscode.window.activeTextEditor);
+	}
 }
 
 function deactivate() {}
