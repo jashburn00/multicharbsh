@@ -103,12 +103,16 @@ class functions {
         //scan backward until we have found more start delimeters than end delimeters
         let scan_pos = cursor_pos;
         let count = 0;
+        
         while (scan_pos){
-            let start_delim_range = new vscode.Range(scan_pos.translate(0, -1*start_delim.length), scan_pos);
-            let end_delim_range = new vscode.Range(scan_pos.translate(0, -1*end_delim.length), scan_pos);
+            // TODO: make sure the incrementCursor() function does not get closer to end of document than endDelim.length
+                // (either in this function or in incrementCursor() )
+            let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*start_delim.length));
+            let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*end_delim.length));
 
             // Check the character at the current position, increment the count if it's the start delim, decrement if it's the end delim
             // startDelim: +1  endDelim: -1  count = 1 -> found it
+            MBSHlog.appendLine("start delim is: "+start_delim+", and we are reading: "+document.getText(start_delim_range));
             if (document.getText(start_delim_range) == start_delim){
                 if(!functions.isPositionCommented(document, scan_pos)){
                     count++;
@@ -130,8 +134,8 @@ class functions {
         scan_pos = cursor_pos;
         count = 0;
         while(scan_pos){
-            let start_delim_range = new vscode.Range(scan_pos.translate(0, -1*start_delim.length), scan_pos);
-            let end_delim_range = new vscode.Range(scan_pos.translate(0, -1*end_delim.length), scan_pos);
+            let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*start_delim.length));
+            let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*end_delim.length));
 
             //scan forward for delimeters until we find an unpaired end delimeter
             if(document.getText(start_delim_range) == start_delim){
@@ -143,9 +147,19 @@ class functions {
                 }
             }
             //increment cursor
-            scan_pos = this.incrementCursor(scan_pos); 
+            if(scan_pos.character < (scan_pos.line.length-end_delim.length) ){ //if we are safe distance from end of line 
+                scan_pos = this.incrementCursor(scan_pos); //then increment normally
+            } else{ //otherwise...
+                if(scan_pos.line == document.lineCount-1){//if we are at the last line
+                    break; //then we break
+                } else{//if not at last line
+                    scan_pos = scan_pos.translate(1, 0); //then we manually skip to next line
+                }
+            }
         }
         const right_delim_pos = scan_pos;
+        MBSHlog.appendLine("Right pos: "+this.printFormatPosition(right_delim_pos));
+        MBSHlog.appendLine("Left pos: "+this.printFormatPosition(left_delim_pos)); //this is null and it shouldn't be null
 
         //return a constructed range if valid
         if(left_delim_pos && right_delim_pos){
@@ -160,13 +174,15 @@ class functions {
      * @returns {vscode.Position} the decremented position, or null if the cursor is already at the beginning of the file
      */
     static decrementCursor(pos, doc){
+
         if (pos.character > 0){
-            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to the left');
+            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to the left ('+this.printFormatPosition(pos)+')');
+            MBSHlog.appendLine('new char value will be: '+(pos.character-1));
             let new_pos = pos.translate(0, -1);
-            return new_pos;
+            return new_pos; 
         }
         else if (pos.line > 0){
-            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to end of previous line'); 
+            MBSHlog.appendLine('IN DECREMENTCURSOR: translating cursor to end of previous line ('+this.printFormatPosition(pos)+')'); 
             // let new_line = doc.lineAt(pos.line - 1);
             // let new_pos = vscode.Position(pos.line - 1, new_line.text.length);
             let new_pos = pos.translate(-1, doc.lineAt(pos.line - 1).text.length);
@@ -174,7 +190,7 @@ class functions {
             // return null;
         }
         else {
-            MBSHlog.appendLine('IN DECREMENTCURSOR: at beginning of range, so returning null.');
+            MBSHlog.appendLine('IN DECREMENTCURSOR: at beginning of range, so returning null. ('+this.printFormatPosition(pos)+')');
             // vscode.window.showInformationMessage("kill himself");
             // character and line are always nonnegative, so this branch means pos.character == 0 and pos.line == 0
             // so we are at the beginning of the file
@@ -250,6 +266,10 @@ class functions {
 
     static printFormatRange(range){
         return "["+range.start.line+", "+range.start.character+"] ["+range.end.line+", "+range.end.character+"]";
+    }
+
+    static printFormatPosition(pos){
+        return "["+pos.line+","+pos.character+"]";
     }
 
 }
