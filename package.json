@@ -1,6 +1,6 @@
 {
-  "name": "multichar-blockscope-highlighter",
-  "displayName": "multichar-blockscope-highlighter",
+  "name": "scope-highlighter",
+  "displayName": "scope-highlighter",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -15,58 +15,58 @@
   "main": "./extension.js",
   "contributes": {
     "configuration": {
-      "title": "multicharbsh configs",
+      "title": "scope-highlighter configs",
       "properties": {
-        "multichar-blockscope-highlighter.startDelimeter": {
+        "scope-highlighter.startDelimeter": {
           "type": "string",
           "default": "{",
           "description": "the string that will be used to delimit start of scope"
         },
-        "multichar-blockscope-highlighter.endDelimeter": {
+        "scope-highlighter.endDelimeter": {
           "type": "string",
           "default": "}",
           "description": "the string that will be used to delimit end of scope"
         },
-        "multichar-blockscope-highlighter.singleLineComment": {
+        "scope-highlighter.singleLineComment": {
           "type": "string",
           "default": "//",
-          "description": "the string that starts a comment"
+          "description": "the prefix that creates a comment line"
         },
-        "multichar-blockscope-highlighter.multiLineCommentStart": {
+        "scope-highlighter.multiLineCommentStart": {
           "type": "string",
           "default": "/*",
-          "description": "the string that is used to start multiline comment blocks in your language"
+          "description": "the symbols used to start multiline comment blocks in your language"
         },
-        "multichar-blockscope-highlighter.multiLineCommentEnd": {
+        "scope-highlighter.multiLineCommentEnd": {
           "type": "string",
           "default": "*/",
-          "description": "the string that is used to end multiline comment blocks in your language"
+          "description": "the symbols used to end multiline comment blocks in your language"
         },
-        "multichar-blockscope-highlighter.red": {
+        "scope-highlighter.red": {
           "type": "integer",
           "default": 100,
-          "description": "the red value for the RGBA highlighting"
+          "description": "the red value for the RGBA highlighting (0-255)"
         },
-        "multichar-blockscope-highlighter.green": {
+        "scope-highlighter.green": {
           "type": "integer",
           "default": 40,
-          "description": "the green value for the RGBA highlighting"
+          "description": "the green value for the RGBA highlighting (0-255)"
         },
-        "multichar-blockscope-highlighter.blue": {
+        "scope-highlighter.blue": {
           "type": "integer",
           "default": 80,
-          "description": "the blue value for the RGBA highlighting"
+          "description": "the blue value for the RGBA highlighting (0-255)"
         },
-        "multichar-blockscope-highlighter.alpha": {
+        "scope-highlighter.alpha": {
           "type": "number",
           "default": 0.4,
-          "description": "the alpha value (opacity) for the RGBA highlighting"
+          "description": "the alpha value (opacity) for the RGBA highlighting (0.0-1.0)"
         }
       }
     },
     "commands": [{
-      "command": "multichar-blockscope-highlighter.proofOfLife",
-      "title": "multicharbsh: Proof of Life"
+      "command": "scope-highlighter.proofOfLife",
+      "title": "scope-highlighter: Proof of Life"
     }]
   },
   "scripts": {
