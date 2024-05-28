@@ -224,7 +224,6 @@ class functions {
      * @description reads user settings into 'delimeters' variable
      */
     static loadDelimeters() {
-        //oralsexdemon!
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
         let contributions = vscode.workspace.getConfiguration('multichar-blockscope-highlighter');
         

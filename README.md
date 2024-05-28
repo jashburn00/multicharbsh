@@ -1,12 +1,10 @@
 # add this for later
 https://code.visualstudio.com/api/get-started/your-first-extension
 # TODO 
-- correct increment/decrement cursor methods 
-  - the vscode.position.translate(lineAmount, charAmount) method does not snap to 0
-  - currently an error is caused because the resulting 'character' value of a position is negative 
-- testing
-  - different delimeters 
-- deployment
+- ignore delimeters found in string literals
+- add "0-255" description for the colors in package.json
+- clean up code comments and logging
+- 
 
 # README - multicharbsh
 

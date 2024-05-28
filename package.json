@@ -1,8 +1,9 @@
 {
-  "name": "multichar-blockscope-highlighter",
-  "displayName": "multichar-blockscope-highlighter",
+  "name": "scope-highlighter",
+  "displayName": "scope-highlighter",
   "description": "",
   "version": "0.0.1",
+  "publisher": "jashburn00",
   "engines": {
     "vscode": "^1.87.0"
   },
