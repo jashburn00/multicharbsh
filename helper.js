@@ -19,34 +19,27 @@ class functions {
      * @description called by the Proof of Life command
      */
     static logTest(ed) {
-        const editor = ed;
         let delim_range;
-        MBSHlog.appendLine("\nExecuting logtest()...");
-
-        /* check if cursor position is commented */{
-            // MBSHlog.appendLine("Attempting to check if current position is a comment...");
-            // MBSHlog.appendLine(this.isPositionCommented(ed.document, ed.selection.active).toString());
-            // MBSHlog.appendLine("");
-        }
-
+        this.loadDelimeters();
         /* get current range from cursor position (delim_range is populated) */{
-            MBSHlog.appendLine("Attempting to get current range...");
-            delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, editor);
+            // MBSHlog.appendLine("Attempting to get current range...");
+            delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, ed);
             if (delim_range == null){
-                vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
+                // vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
             }
             else {
-                MBSHlog.appendLine("The returned range was: ");
-                let text = vscode.window.activeTextEditor.document.getText(delim_range);
-                vscode.window.showInformationMessage(text);
-                MBSHlog.append(text+"\n"); 
+                // MBSHlog.appendLine("The returned range was: ");
+                // let text = vscode.window.activeTextEditor.document.getText(delim_range);
+                // vscode.window.showInformationMessage(text);
+                // MBSHlog.append(text+"\n"); 
             }
         }
         
         /* apply decoration to delim_range */{
-            MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
+            // MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
             this.paintRange(ed, delim_range);
         }
+        // MBSHlog.appendLine("Used delimeters: "+delimeters.startDelimeter+", "+delimeters.endDelimeter);
     }
 
     /**
@@ -94,7 +87,7 @@ class functions {
         const editor = ed;
         const doc = editor.document;
         if (!editor) {
-            MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingDelimeters method.");
+            // MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingDelimeters method.");
             return null;
         }
         const document = editor.document;
@@ -139,7 +132,7 @@ class functions {
             let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*end_delim.length));
 
             //scan forward for delimeters until we find an unpaired end delimeter
-            MBSHlog.appendLine("end delim is: "+end_delim+" and we are reading: "+document.getText(end_delim_range));
+            // MBSHlog.appendLine("end delim is: "+end_delim+" and we are reading: "+document.getText(end_delim_range));
 
             if(document.getText(start_delim_range) == start_delim){
                 count--;
@@ -150,17 +143,15 @@ class functions {
                 }
             }
             //increment cursor
-            MBSHlog.appendLine("(jank stuff) scan_pos character is: "+scan_pos.character);
-            MBSHlog.appendLine("(jank stuff) and line length is: "+document.lineAt(scan_pos.line).range.end.character);
+            // MBSHlog.appendLine("(jank stuff) scan_pos character is: "+scan_pos.character);
+            // MBSHlog.appendLine("(jank stuff) and line length is: "+document.lineAt(scan_pos.line).range.end.character);
             //let lastPosition = doc.lineAt(doc.lineCount - 1).range.end;
 
             if(scan_pos.character < document.lineAt(scan_pos.line).range.end.character){ //if we are safe distance from end of line 
-                MBSHlog.appendLine("incrementing cursor normally");
+                // MBSHlog.appendLine("incrementing cursor normally");
                 scan_pos = this.incrementCursor(scan_pos, document); //then increment normally
             } else{ //otherwise...
-                MBSHlog.appendLine("Breaking my balls");
                 if(scan_pos.line == document.lineCount-1){//if we are at the last line
-                    MBSHlog.appendLine("we at last line homie");
                     break; //then we break
                 } else{//if not at last line
                     scan_pos = new vscode.Position(scan_pos.translate(1,0).line, 0); //then we manually skip to next line
@@ -168,8 +159,8 @@ class functions {
             }
         }
         const right_delim_pos = scan_pos.translate(0, end_delim.length);
-        MBSHlog.appendLine("Right pos: "+this.printFormatPosition(right_delim_pos));
-        MBSHlog.appendLine("Left pos: "+this.printFormatPosition(left_delim_pos)); //this is null and it shouldn't be null
+        // MBSHlog.appendLine("Right pos: "+this.printFormatPosition(right_delim_pos));
+        // MBSHlog.appendLine("Left pos: "+this.printFormatPosition(left_delim_pos)); //this is null and it shouldn't be null
 
         //return a constructed range if valid
         if(left_delim_pos && right_delim_pos){
@@ -194,7 +185,7 @@ class functions {
             return new_pos;
         }
         else {
-            MBSHlog.appendLine('IN DECREMENTCURSOR: at beginning of range, so returning null. ('+this.printFormatPosition(pos)+')');
+            // MBSHlog.appendLine('IN DECREMENTCURSOR: at beginning of range, so returning null. ('+this.printFormatPosition(pos)+')');
             return null;
         }
     }
@@ -204,17 +195,17 @@ class functions {
      * @returns {vscode.Position} the incremented position, or null if increment not possible
      */
     static incrementCursor(pos, doc){
-        MBSHlog.appendLine("(In IncrementCursor) before increment: "+this.printFormatPosition(pos));
+        // MBSHlog.appendLine("(In IncrementCursor) before increment: "+this.printFormatPosition(pos));
         let lastPosition = doc.lineAt(doc.lineCount - 1).range.end;
-        MBSHlog.appendLine("E pp");
+        // MBSHlog.appendLine("E pp");
         if (pos.isEqual(lastPosition)){
-            MBSHlog.appendLine("IN INCREMENTCURSOR: returning null because we are at the last position");
+            // MBSHlog.appendLine("IN INCREMENTCURSOR: returning null because we are at the last position");
             return null; 
         } else if (pos.character == doc.lineAt(pos.line).text.length){
-            MBSHlog.appendLine("IN INCREMENTCURSOR: returning first character at next line");
+            // MBSHlog.appendLine("IN INCREMENTCURSOR: returning first character at next line");
             return new vscode.Position(pos.line+1, 0);
         } else {
-            MBSHlog.appendLine("IN INCREMENTCURSOR: incrementing normally (horizontally)");
+            // MBSHlog.appendLine("IN INCREMENTCURSOR: incrementing normally (horizontally)");
             return new vscode.Position(pos.line, pos.character+1);
         }
     }
