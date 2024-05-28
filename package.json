@@ -2,8 +2,12 @@
   "name": "scope-highlighter",
   "displayName": "scope-highlighter",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "jashburn00",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jashburn00/multicharbsh"
+  },
   "engines": {
     "vscode": "^1.87.0"
   },

@@ -1,5 +1,9 @@
 ## Release Notes
-### v 0.0.0.1 (May 26, 2024)
+### v 0.0.2 (May 28, 2024)
+* README page updated with usage examples
+* The extension is incomplete, but works in some situations (issue cases described below).
+  * If the delimeters do not commonly appear in code or comments (such as }, #, @, etc.) then it will be less prone to the current version's issues.
+### v 0.0.1 (May 26, 2024)
 * The extension is incomplete, but works in some situations (issue cases described below).
   * If the delimeters do not commonly appear in code or comments (such as }, #, @, etc.) then it will be less prone to the current version's issues.
 
