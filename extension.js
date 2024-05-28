@@ -6,7 +6,7 @@ function activate(context) {
 
 	// process to register the proof of life command (see package.json "commands")
 	let POLcommand = vscode.commands.registerCommand(
-		'multichar-blockscope-highlighter.proofOfLife', 
+		'scope-highlighter.proofOfLife', 
 		function () {
 			functions.logTest(vscode.window.activeTextEditor);
 		}

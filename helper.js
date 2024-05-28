@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const MBSHlog = vscode.window.createOutputChannel('MBSH Log'); //this replaces the need for running POL command
+const MBSHlog = vscode.window.createOutputChannel('Scope-Highlighter Log'); //this replaces the need for running POL command
 let delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
     "startDelimeter": "{",
     "endDelimeter": "}",
@@ -225,7 +225,7 @@ class functions {
      */
     static loadDelimeters() {
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
-        let contributions = vscode.workspace.getConfiguration('multichar-blockscope-highlighter');
+        let contributions = vscode.workspace.getConfiguration('scope-highlighter');
         
         delimeters = {
             startDelimeter: contributions.get('startDelimeter'),
