@@ -42,6 +42,7 @@ This extension contributes the following user settings:
 - Extension must sometimes be reloaded after making configuration changes.
 
 # Developer TODO List 
+- correct spelling of 'delimeter' 
 - investigate auto reload extension settings
 - fix single line comment issue
 - fix string literals issue
