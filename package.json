@@ -22,12 +22,12 @@
     "configuration": {
       "title": "scope-highlighter configs",
       "properties": {
-        "scope-highlighter.startDelimeter": {
+        "scope-highlighter.startdelimiter": {
           "type": "string",
           "default": "{",
           "description": "the string that will be used to delimit start of scope"
         },
-        "scope-highlighter.endDelimeter": {
+        "scope-highlighter.enddelimiter": {
           "type": "string",
           "default": "}",
           "description": "the string that will be used to delimit end of scope"
@@ -66,6 +66,11 @@
           "type": "number",
           "default": 0.4,
           "description": "the alpha value (opacity) for the RGBA highlighting (0.0-1.0)"
+        },
+        "scope-highlighter.entireLine":{
+          "type": "boolean",
+          "default": true,
+          "description": "a boolean representing if you want entire lines  to be highlighted (true), or just the characters in scope (false)."
         }
       }
     },

@@ -1,4 +1,4 @@
-const {functions, delimeters, log} = require('./helper');
+const {functions, delimiters, log} = require('./helper');
 const vscode = require('vscode');
 var selection = new vscode.Position(0,0);
 
@@ -16,12 +16,12 @@ function activate(context) {
 	
 	context.subscriptions.push(disposableUpdate);
 	context.subscriptions.push(POLcommand);
-	functions.loadDelimeters();
+	functions.loaddelimiters();
 	log.appendLine("Extension has been activated.");
 		
 	// vscode.window.onDidChangeTextEditorSelection(update);
 	// vscode.workspace.onDidChangeTextDocument(update); 
-	// vscode.workspace.onDidChangeConfiguration(functions.loadDelimeters);
+	// vscode.workspace.onDidChangeConfiguration(functions.loaddelimiters);
 }
 
 function update(){

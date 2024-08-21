@@ -1,15 +1,16 @@
 const vscode = require('vscode');
 const MBSHlog = vscode.window.createOutputChannel('Scope-Highlighter Log'); //this replaces the need for running POL command
-let delimeters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
-    "startDelimeter": "{",
-    "endDelimeter": "}",
+let delimiters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
+    "startdelimiter": "{",
+    "enddelimiter": "}",
     "singleLineComment": "//",
     "multilineCommentStart": "/*",
     "multilineCommentEnd": "*/",
     "red": 100,
     "green": 40,
     "blue": 80,
-    "alpha": 0.4
+    "alpha": 0.4,
+    "entireLine": true
 } 
 let decorations = [];
 
@@ -20,10 +21,10 @@ class functions {
      */
     static logTest(ed) {
         let delim_range;
-        this.loadDelimeters();
+        this.loaddelimiters();
         /* get current range from cursor position (delim_range is populated) */{
             // MBSHlog.appendLine("Attempting to get current range...");
-            delim_range = this.getRangeUsingDelimeters(delimeters.startDelimeter, delimeters.endDelimeter, ed);
+            delim_range = this.getRangeUsingdelimiters(delimiters.startdelimiter, delimiters.enddelimiter, ed);
             if (delim_range == null){
                 // vscode.window.showInformationMessage("the range returned from our method was NULL.\n");
             }
@@ -39,7 +40,7 @@ class functions {
             // MBSHlog.appendLine("Attempting to paint the range now:\n"+this.printFormatRange(delim_range));
             this.paintRange(ed, delim_range);
         }
-        // MBSHlog.appendLine("Used delimeters: "+delimeters.startDelimeter+", "+delimeters.endDelimeter);
+        // MBSHlog.appendLine("Used delimiters: "+delimiters.startdelimiter+", "+delimiters.enddelimiter);
     }
 
     /**
@@ -49,7 +50,7 @@ class functions {
      */
     static paintRange(ed, range){
         //create the necessary decorationType and decorationOption
-        decorations.push( this.createDecoration(delimeters.red, delimeters.green, delimeters.blue, delimeters.alpha));
+        decorations.push( this.createDecoration(delimiters.red, delimiters.green, delimiters.blue, delimiters.alpha));
         const decorationOptions = this.createDecorationOptions(range);
         //clear any existing decoration (must reference original decoration to remove it properly, so we use a list)
         if (decorations.length > 1){
@@ -64,7 +65,7 @@ class functions {
         let formatString = "rgba("+r+","+g+","+b+","+a+")";
         return vscode.window.createTextEditorDecorationType({
             backgroundColor: ''+formatString,
-            isWholeLine: false
+            isWholeLine: delimiters.entireLine
         });
     }
 
@@ -77,23 +78,23 @@ class functions {
     }
 
     /**
-     * @param {String} start delimeter
-     * @param {String} end delimeter
+     * @param {String} start delimiter
+     * @param {String} end delimiter
      * @param {vscode.editor} ed the editor
      * @return {vscode.Range} returns null if no valid range was found
      */
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
-    static getRangeUsingDelimeters(start_delim, end_delim, ed){
+    static getRangeUsingdelimiters(start_delim, end_delim, ed){
         const editor = ed;
         const doc = editor.document;
         if (!editor) {
-            // MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingDelimeters method.");
+            // MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingdelimiters method.");
             return null;
         }
         const document = editor.document;
         const cursor_pos = editor.selection.active;
 
-        //scan backward until we have found more start delimeters than end delimeters
+        //scan backward until we have found more start delimiters than end delimiters
         // let scan_pos = new vcscursor_pos;
         let scan_pos = new vscode.Position(cursor_pos.line, cursor_pos.character);
         let count = 0;
@@ -124,14 +125,14 @@ class functions {
         }
         const left_delim_pos = scan_pos;
 
-        //scan forward until we have found more end delimeters than start delimeters
+        //scan forward until we have found more end delimiters than start delimiters
         scan_pos = new vscode.Position(cursor_pos.line, cursor_pos.character);
         count = 0;
         while(scan_pos){
             let start_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*start_delim.length));
             let end_delim_range = new vscode.Range(scan_pos, scan_pos.translate(0, 1*end_delim.length));
 
-            //scan forward for delimeters until we find an unpaired end delimeter
+            //scan forward for delimiters until we find an unpaired end delimiter
             // MBSHlog.appendLine("end delim is: "+end_delim+" and we are reading: "+document.getText(end_delim_range));
 
             if(document.getText(start_delim_range) == start_delim){
@@ -212,22 +213,23 @@ class functions {
     
     
     /** 
-     * @description reads user settings into 'delimeters' variable
+     * @description reads user settings into 'delimiters' variable
      */
-    static loadDelimeters() {
+    static loaddelimiters() {
         // https://stackoverflow.com/questions/44151691/vscode-is-there-an-api-for-accessing-config-values-from-a-vscode-extension
         let contributions = vscode.workspace.getConfiguration('scope-highlighter');
         
-        delimeters = {
-            startDelimeter: contributions.get('startDelimeter'),
-            endDelimeter: contributions.get('endDelimeter'),
+        delimiters = {
+            startdelimiter: contributions.get('startdelimiter'),
+            enddelimiter: contributions.get('enddelimiter'),
             singleLineComment: contributions.get('singleLineComment'),
             multilineCommentStart: contributions.get('multiLineCommentStart'),
             multilineCommentEnd: contributions.get('multiLineCommentEnd'),
             red: contributions.get('red'),
             green: contributions.get('green'),
             blue: contributions.get('blue'),
-            alpha: contributions.get('alpha')
+            alpha: contributions.get('alpha'),
+            entireLine: contributions.get('entireLine')
         };
     }
 
@@ -238,7 +240,7 @@ class functions {
      */
     static isPositionCommentedOrLiteral(d, p) {
         let line = d.lineAt(p.line);
-        if (line.text.trim().startsWith(delimeters.singleLineComment)){
+        if (line.text.trim().startsWith(delimiters.singleLineComment)){
             return true;
         } 
 
@@ -246,8 +248,8 @@ class functions {
         let offset = d.offsetAt(p);
         let text = d.getText();
 
-        let cmtStartOffset = text.lastIndexOf(delimeters.multilineCommentStart, offset - 1); 
-        let cmtEndOffset = text.lastIndexOf(delimeters.multilineCommentEnd, offset - 1);
+        let cmtStartOffset = text.lastIndexOf(delimiters.multilineCommentStart, offset - 1); 
+        let cmtEndOffset = text.lastIndexOf(delimiters.multilineCommentEnd, offset - 1);
         
 
         if (cmtStartOffset > cmtEndOffset) { // > : after
@@ -258,10 +260,11 @@ class functions {
         let offsetL = d.offsetAt(p);
         let textL = d.getText();
         // 'poop' lsdkjfslkdfj 'dslfksjdf' asldkfdjlaksd
-        let cmtStartOffsetL = text.lastIndexOf("'", offsetL - 1); 
-        let cmtEndOffsetL = text.lastIndexOf("'", offsetL - 1);
         
-
+        
+        if(numQuotes % 2 == 1 || numDoubleQuotes % 2 == 1){
+            return true;
+        }
         if (cmtStartOffset > cmtEndOffset) { // > : after
             return true;
         } 
@@ -281,6 +284,6 @@ class functions {
 
 module.exports = { 
     functions: functions,
-    delimeters: delimeters,
+    delimiters: delimiters,
     log: MBSHlog
 };
