@@ -257,14 +257,14 @@ class functions {
         } 
 
         //TODO: for string literals 
-        let offsetL = d.offsetAt(p);
-        let textL = d.getText();
-        // 'poop' lsdkjfslkdfj 'dslfksjdf' asldkfdjlaksd
+        // let offsetL = d.offsetAt(p);
+        // let textL = d.getText();
+        // // 'poop' lsdkjfslkdfj 'dslfksjdf' asldkfdjlaksd
         
         
-        if(numQuotes % 2 == 1 || numDoubleQuotes % 2 == 1){
-            return true;
-        }
+        // if(numQuotes % 2 == 1 || numDoubleQuotes % 2 == 1){
+        //     return true;
+        // }
         if (cmtStartOffset > cmtEndOffset) { // > : after
             return true;
         } 
