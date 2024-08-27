@@ -14,6 +14,8 @@ Business Central AL example:
 
 *Note: the extension is currently not designed to handle indentation-based scope.*
 
+*Note: Delimiters found outside of comments and strings/literals are not ignored. It is recommended to not include your delimiters in names or identifiers (or outside of string literals).*
+
 ## Extension Settings
 This extension contributes the following user settings:
 
@@ -33,8 +35,6 @@ This extension contributes the following user settings:
 - commented or literal instances of multiline comment start/end characters are counted when they should be ignored. 
   - e.g. ```/* /* */ let str = "/*";```  <- both of these multiline comment start symbols would be counted. 
 - Extension must sometimes be reloaded after making configuration changes.
-
-\* Delimiters found outside of comments and strings/literals are not ignored. It is recommended to not include your delimiters in names or identifiers (or outside of string literals). 
 
 ## Release Notes
 ### v 0.0.3 (August, 2024)
