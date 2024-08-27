@@ -29,9 +29,10 @@ This extension contributes the following user settings:
 * `scope-highlighter.entireLine`: whether to highlight entire lines included in the scope or only the characters in scope. Default is true (entire lines will be highlighted).
 
 ## Known Issues
-- Extension must sometimes be reloaded after making configuration changes.
-- delimiter instances in single line comments that contain code on the same line are not counted correctly.
+- delimiter instances in single line comments that contain code on the same line are sometimes not counted correctly.
 - commented or literal instances of multiline comment start/end characters are counted when they should be ignored. 
+  - e.g. ```/* /* */ let str = "/*";```  <- both of these multiline comment start symbols would be counted. 
+- Extension must sometimes be reloaded after making configuration changes.
 
 \* Delimiters found outside of comments and strings/literals are not ignored. It is recommended to not include your delimiters in names or identifiers (or outside of string literals). 
 
