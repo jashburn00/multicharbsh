@@ -31,12 +31,9 @@ function update(){
 
 function handleWindowChange(){
 	if(vscode.window.state.focused == false){ //if the window is no longer selected, either:
-		log.appendLine('Uhh... Earth to API? '+ delimiters.highlightInactive);
 		if(delimiters.highlightInactive == true){ //handle highlightInactive on
-			log.appendLine('The setting was turned on!');
 			return; //we leave the highlight on
 		} else { //or handle highlightInactive off
-			log.appendLine('Window should be removing highlights now.');
 			functions.clearHighlights(vscode.window.activeTextEditor);
 		}
 	} else { //or if the window is now active... 
