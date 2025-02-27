@@ -1,23 +1,24 @@
 const vscode = require('vscode');
 const MBSHlog = vscode.window.createOutputChannel('Scope-Highlighter Log'); //this replaces the need for running POL command
-let delimiters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
-    //these values override the default settings in the test environment
-    "startdelimiter": "{",
-    "enddelimiter": "}",
-    "singleLineComment": "//",
-    "multilineCommentStart": "/*",
-    "multilineCommentEnd": "*/",
-    "red": 100,
-    "green": 40,
-    "blue": 80,
-    "alpha": 0.4,
-    "entireLine": true,
-    "highlightInactive": false
-} 
+
+let contributions = vscode.workspace.getConfiguration('scope-highlighter');
+let delimiters = {
+    startdelimiter: contributions.get('startdelimiter'),
+    enddelimiter: contributions.get('enddelimiter'),
+    singleLineComment: contributions.get('singleLineComment'),
+    multilineCommentStart: contributions.get('multiLineCommentStart'),
+    multilineCommentEnd: contributions.get('multiLineCommentEnd'),
+    red: contributions.get('red'),
+    green: contributions.get('green'),
+    blue: contributions.get('blue'),
+    alpha: contributions.get('alpha'),
+    entireLine: contributions.get('entireLine'),
+    highlightInactive: contributions.get('highlightInactive')
+};
+
 let decorations = [];
 
 class functions {
-
     /**
      * @description called by the Proof of Life command
      */
@@ -55,10 +56,7 @@ class functions {
         decorations.push( this.createDecoration(delimiters.red, delimiters.green, delimiters.blue, delimiters.alpha));
         const decorationOptions = this.createDecorationOptions(range);
         //clear any existing decoration (must reference original decoration to remove it properly, so we use a list)
-        if (decorations.length > 1){
-            ed.setDecorations(decorations[0], []);
-            decorations = [decorations[1]];
-        }
+        this.clearHighlights(ed);
         //apply our new decoration 
         ed.setDecorations(decorations[0], decorationOptions);
     }
@@ -80,9 +78,11 @@ class functions {
     }
 
     static clearHighlights(ed){
+        MBSHlog.appendLine(`attempting to clear decorations and there are ${decorations.length} decorations`);
         if(decorations.length > 0){
             ed.setDecorations(decorations[0], []);
         }
+        decorations = [decorations[0]];
     }
 
     /**
