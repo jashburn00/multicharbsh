@@ -2,7 +2,7 @@
   "name": "scope-highlighter",
   "displayName": "scope-highlighter",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "jashburn00",
   "repository": {
     "type": "git",
@@ -71,6 +71,11 @@
           "type": "boolean",
           "default": true,
           "description": "a boolean representing if you want entire lines  to be highlighted (true), or just the characters in scope (false)."
+        },
+        "scope-highlighter.highlightInactive": {
+          "type": "boolean",
+          "default": false,
+          "description": "a boolean representing if you want inactive windows to keep their highlight"
         }
       }
     },

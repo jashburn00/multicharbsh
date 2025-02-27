@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const MBSHlog = vscode.window.createOutputChannel('Scope-Highlighter Log'); //this replaces the need for running POL command
 let delimiters = { //these values get overwritten by user input; this is just in case the default settings don't get applied
+    //these values override the default settings in the test environment
     "startdelimiter": "{",
     "enddelimiter": "}",
     "singleLineComment": "//",
@@ -10,7 +11,8 @@ let delimiters = { //these values get overwritten by user input; this is just in
     "green": 40,
     "blue": 80,
     "alpha": 0.4,
-    "entireLine": true
+    "entireLine": true,
+    "highlightInactive": false
 } 
 let decorations = [];
 
@@ -77,6 +79,12 @@ class functions {
         return retval;
     }
 
+    static clearHighlights(ed){
+        if(decorations.length > 0){
+            ed.setDecorations(decorations[0], []);
+        }
+    }
+
     /**
      * @param {String} start delimiter
      * @param {String} end delimiter
@@ -86,7 +94,6 @@ class functions {
     // https://vshaxe.github.io/vscode-extern/vscode/TextDocument.html
     static getRangeUsingdelimiters(start_delim, end_delim, ed){
         const editor = ed;
-        const doc = editor.document;
         if (!editor) {
             // MBSHlog.appendLine("The passed editor was NULL inside of getRangeUsingdelimiters method.");
             return null;
@@ -229,7 +236,8 @@ class functions {
             green: contributions.get('green'),
             blue: contributions.get('blue'),
             alpha: contributions.get('alpha'),
-            entireLine: contributions.get('entireLine')
+            entireLine: contributions.get('entireLine'),
+            highlightInactive: contributions.get('highlightInactive')
         };
     }
 
