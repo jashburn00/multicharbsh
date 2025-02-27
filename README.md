@@ -39,6 +39,9 @@ This extension contributes the following user settings:
 - Extension must sometimes be reloaded after making configuration changes.
 
 ## Release Notes
+### v 0.0.5 (February, 2025)
+* fixed a bug related to the ```highlightInactive``` feature. 
+
 ### v 0.0.4 (February, 2025)
 * Added the ```highlightInactive``` setting to allow further customization.
 * Fixed an issue where re-focusing on inactive windows would make the highlights at that position permanent.  
