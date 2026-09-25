@@ -59,4 +59,3 @@ This extension contributes the following user settings:
 # Developer TODO List
 - fix single line comment issue
 - fix [not] ignoring delimiters inside string literals
-- make my code prettier and more extensible
